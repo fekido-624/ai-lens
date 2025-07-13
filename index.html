@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Camera Test</title>
+</head>
+<body>
+  <h1>Camera Test</h1>
+  <button onclick="startCamera()">Buka Kamera</button><br><br>
+  <video id="camera" autoplay playsinline width="320" height="240"></video>
+
+  <script>
+    function startCamera() {
+      const video = document.getElementById('camera');
+
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(stream => {
+            video.srcObject = stream;
+          })
+          .catch(error => {
+            console.error("Kamera gagal dibuka:", error);
+            alert("Kamera gagal dibuka: " + error.message);
+          });
+      } else {
+        alert("Browser anda tidak menyokong kamera.");
+      }
+    }
+  </script>
+</body>
+</html>
