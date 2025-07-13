@@ -1,54 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-      }
-      html, body {
-        width: 100vw;
-        height: 100vh;
-        overflow: hidden;
-        background: black;
-      }
-      video#camera {
-        width: 100vw;
-        height: 100vh;
-        object-fit: cover;
-        display: block;
-      }
-    </style>
-
-
   <meta charset="UTF-8">
-  <title>Camera Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AI Lens</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: black;
+    }
+    video#camera {
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+    }
+    .controls {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 999;
+    }
+    .controls button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Camera Test</h1>
-  <button onclick="startCamera()">Buka Kamera</button><br><br>  
+  <div class="controls">
+    <button onclick="startCamera('user')">Depan</button>
+    <button onclick="startCamera('environment')">Belakang</button>
+  </div>
+
   <video id="camera" autoplay playsinline></video>
 
-
-  <script>
-    function startCamera() {
-      const video = document.getElementById('camera');
-
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-          .then(stream => {
-            video.srcObject = stream;
-          })
-          .catch(error => {
-            console.error("Kamera gagal dibuka:", error);
-            alert("Kamera gagal dibuka: " + error.message);
-          });
-      } else {
-        alert("Browser anda tidak menyokong kamera.");
-      }
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
-</html>                                                                                                                                                
+</html>
