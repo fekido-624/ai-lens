@@ -1,22 +1,23 @@
 window.addEventListener("DOMContentLoaded", startCamera);
 
 function startCamera() {
-  const video = document.getElementById('camera');
+  const video = document.getElementById("camera");
 
   const constraints = {
     video: {
-      facingMode: { exact: "environment" } // guna kamera belakang
-    }
+      facingMode: { ideal: "environment" } // cuba kamera belakang
+    },
+    audio: false
   };
 
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia(constraints)
-      .then(stream => {
+      .then(function (stream) {
         video.srcObject = stream;
       })
-      .catch(error => {
+      .catch(function (error) {
         console.error("Kamera gagal dibuka:", error);
-        alert("Kamera gagal dibuka: " + error.message);
+        alert("Gagal buka kamera: " + error.message);
       });
   } else {
     alert("Browser anda tidak menyokong kamera.");
