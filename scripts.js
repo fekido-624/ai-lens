@@ -1,66 +1,60 @@
-let model, webcam, labelContainer, maxPredictions;
-let currentStream = null;
+let model, maxPredictions, currentStream = null;
 
-// Inisialisasi Teachable Machine
-async function initTM() {
-    const URL = "./model/";
-    const modelURL = URL + "model.json";
-    const metadataURL = URL + "metadata.json";
-
-    model = await tmImage.load(modelURL, metadataURL);
-    maxPredictions = model.getTotalClasses();
-
-    labelContainer = document.createElement("div");
-    labelContainer.setAttribute("id", "labelContainer");
-    document.body.appendChild(labelContainer);
+// Load model once video dimulakan
+async function initModel() {
+  const modelURL = "./model/model.json";
+  const metadataURL = "./model/metadata.json";
+  model = await tmImage.load(modelURL, metadataURL);
+  maxPredictions = model.getTotalClasses();
+  console.log("Model berjaya dimuat.");
+  loopPrediction();
 }
 
-// Mula kamera + pengecaman live
+function loopPrediction() {
+  const video = document.getElementById("camera");
+
+  setInterval(async () => {
+    if (!model || !video) return;
+    const prediction = await model.predict(video);
+    let result = "";
+
+    prediction.forEach(pred => {
+      if (pred.probability > 0.8) {
+        result += `${pred.className} (${(pred.probability * 100).toFixed(1)}%)<br>`;
+      }
+    });
+
+    const label = document.getElementById("labelContainer");
+    label.innerHTML = result || "Mengesan...";
+  }, 500);
+}
+
 async function startCamera(facingMode = "environment") {
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-    }
+  const video = document.getElementById("camera");
 
-    const constraints = {
-        video: { facingMode: { ideal: facingMode } },
-        audio: false
+  if (currentStream) {
+    currentStream.getTracks().forEach(track => track.stop());
+  }
+
+  const constraints = {
+    video: { facingMode: { ideal: facingMode } },
+    audio: false
+  };
+
+  try {
+    currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = currentStream;
+
+    video.onloadedmetadata = () => {
+      video.play();
+      initModel(); // model dimuat selepas video ready
     };
-
-    try {
-        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-        const video = document.getElementById("camera");
-        video.srcObject = currentStream;
-
-        video.onloadedmetadata = async () => {
-            video.play();
-            await initTM();
-            loopDetection();
-        };
-    } catch (err) {
-        alert("Kamera gagal dibuka: " + err.message);
-    }
+  } catch (err) {
+    console.error("Gagal buka kamera:", err);
+    alert("Kamera gagal dibuka: " + err.message);
+  }
 }
 
-// Loop detection setiap 500ms
-function loopDetection() {
-    setInterval(async () => {
-        if (!model) return;
-
-        const video = document.getElementById("camera");
-        const prediction = await model.predict(video);
-
-        labelContainer.innerHTML = ""; // clear sebelum update
-
-        prediction.forEach(pred => {
-            if (pred.probability > 0.8) {
-                const label = `${pred.className} (${(pred.probability * 100).toFixed(1)}%)`;
-                labelContainer.innerHTML += `<div style="color:white;font-size:20px">${label}</div>`;
-            }
-        });
-    }, 500);
-}
-
-// Mula auto kamera belakang bila page load
 window.addEventListener("DOMContentLoaded", () => {
-    startCamera("environment");
+  startCamera("environment");
 });
