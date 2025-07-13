@@ -1,27 +1,31 @@
 let currentStream = null;
 
-function startCamera(facingMode = "environment") {
-  const video = document.getElementById("camera");
+const video     = document.getElementById('camera');
+const frontBtn  = document.getElementById('frontBtn');
+const rearBtn   = document.getElementById('rearBtn');
 
-  // Hentikan stream sebelumnya (kalau ada)
+frontBtn.addEventListener('click', () => startCamera('user'));
+rearBtn .addEventListener('click', () => startCamera('environment'));
+
+function startCamera(facingMode = 'environment') {
+
+  // Hentikan stream lama jika ada
   if (currentStream) {
-    currentStream.getTracks().forEach(track => track.stop());
+    currentStream.getTracks().forEach(t => t.stop());
   }
 
   const constraints = {
-    video: {
-      facingMode: { ideal: facingMode }
-    },
-    audio: false
+    audio: false,
+    video: {facingMode: {ideal: facingMode}}
   };
 
   navigator.mediaDevices.getUserMedia(constraints)
-    .then(function (stream) {
+    .then(stream => {
       currentStream = stream;
       video.srcObject = stream;
     })
-    .catch(function (error) {
-      console.error("Kamera gagal dibuka:", error);
-      alert("Gagal buka kamera: " + error.message);
+    .catch(err => {
+      console.error('Gagal buka kamera:', err);
+      alert('Tak dapat akses kamera: ' + err.message);
     });
 }
