@@ -2,8 +2,8 @@ let model, maxPredictions, currentStream = null;
 
 // Load model once video dimulakan
 async function initModel() {
-  const modelURL = "./model/model.json";
-  const metadataURL = "./model/metadata.json";
+  const modelURL = "https://teachablemachine.withgoogle.com/models/xDrwhZRqN/model.json";
+  const metadataURL = "https://teachablemachine.withgoogle.com/models/xDrwhZRqN/metadata.json";
   model = await tmImage.load(modelURL, metadataURL);
   maxPredictions = model.getTotalClasses();
   console.log("Model berjaya dimuat.");
@@ -19,7 +19,7 @@ function loopPrediction() {
     let result = "";
 
     prediction.forEach(pred => {
-      if (pred.probability > 0.8) {
+      if (pred.probability > 0.8 && pred.className !== "Empty") {
         result += `${pred.className} (${(pred.probability * 100).toFixed(1)}%)<br>`;
       }
     });
